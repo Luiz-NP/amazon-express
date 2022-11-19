@@ -27,15 +27,11 @@ app.get("/getUserClients", (req, res) => {
 app.get("/getConstructions", (req, res) => {
     const clientId = req.body.clientId;
 
-    try {
-        db.query(`SELECT * FROM tb_jobsite WHERE client_id = ${clientId}`, (err, data) => {
-            if (err) throw new Error(err);
+    db.query(`SELECT * FROM tb_jobsite WHERE client_id = ${clientId}`, (err, data) => {
+        if (err) return res.json({"error": err});
 
-            res.json(data.rows);
-        })
-    } catch (error) {
-        res.json({"error": error});
-    }
+        return res.json(data.rows);
+    })
 })
 
 /* ==================== POST ROUTES ==================== */
@@ -44,15 +40,11 @@ app.post("/createNewClient", (req, res) => {
     const architectId = req.body.architectId;
     const clientName = req.body.clientName;
 
-    try {
-        db.query("INSERT INTO tb_client (architect_id, client_name) VALUES ($1, $2)", [architectId, clientName], (err) => {
-            if (err) throw new Error(err);
+    db.query("INSERT INTO tb_client (architect_id, client_name) VALUES ($1, $2)", [architectId, clientName], (err) => {
+        if (err) return res.json({"error": err});
 
-            res.json({"message": "success"});
-        });
-    } catch (error) {
-        res.json({"error": error});
-    }
+        res.json({"message": "success"});
+    });
 });
 
 app.post("/createNewConstruction", (req, res) => {
