@@ -9,14 +9,15 @@ require("./db/connect");
 
 /* ==================== GET ROUTES ==================== */
 
-app.get("/getUserCustomers", (req, res) => {
-    const architectId = req.body.architectId;
+app.get("/getUserCustomers/:architectId", (req, res) => {
+    const architectId = req.params.architectId;
+    console.log(architectId);
 
     try {
-        db.query(`SELECT * FROM tb_customer WHERE architect_id = ${architectId}` , (err, data) => {
-            if (err) throw new Error(err);
+        db.query("SELECT * FROM tb_customer WHERE architect_id = ($1)", [architectId] , (err, data) => {
+            if (err) return res.json({"error": err});
 
-            res.json(data.rows);
+            return res.json(data.rows);
         });
     } catch (error) {
         res.json({"error": error});
@@ -24,8 +25,8 @@ app.get("/getUserCustomers", (req, res) => {
 
 });
 
-app.get("/getConstructions", (req, res) => {
-    const customerId = req.body.customerId;
+app.get("/getConstructions/:customerId", (req, res) => {
+    const customerId = req.params.customerId;
 
     db.query(`SELECT * FROM tb_construction WHERE customer_id = ${customerId}`, (err, data) => {
         if (err) return res.json({"error": err});

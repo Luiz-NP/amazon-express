@@ -2,7 +2,7 @@ const db = require('../src/db/pool');
 require("../src/db/connect");
 
 db.query(`CREATE TABLE tb_customer(
-architect_id integer NOT NULL,
+architect_id VARCHAR (50) NOT NULL,
 id serial PRIMARY KEY,
 customer_name VARCHAR (50) UNIQUE NOT NULL)`, (err) => {
   if (err) console.log(err);
