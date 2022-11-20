@@ -1,14 +1,21 @@
 const db = require('../src/db/pool');
+require("../src/db/connect");
 
-async function dropTables(){
-    await db.connect()
-    await db.query(`DROP TABLE tb_client CASCADE`)
-    await db.query(`DROP TABLE tb_jobsite CASCADE`)
-    await db.query(`DROP TABLE tb_client_jobsite CASCADE`)
+db.query(`DROP TABLE tb_customer`, (err) => {
+  if (err) console.log(err);
+
+  console.log("tb_customer droped.");
+
+  db.query(`DROP TABLE tb_construction`, (err) => {
+    if (err) console.log(err);
   
-    await db.end()
+    console.log("tb_construction droped.");
   
-    console.log("dropTables(): Done!");
-  }
-  
-  dropTables()
+    process.exit();
+  })
+})
+
+
+
+
+// db.query(`DROP TABLE tb_client_jobsite CASCADE`)
