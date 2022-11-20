@@ -9,11 +9,11 @@ require("./db/connect");
 
 /* ==================== GET ROUTES ==================== */
 
-app.get("/getUserClients", (req, res) => {
+app.get("/getUserCustomers", (req, res) => {
     const architectId = req.body.architectId;
 
     try {
-        db.query(`SELECT * FROM tb_client WHERE architect_id = ${architectId}` , (err, data) => {
+        db.query(`SELECT * FROM tb_customer WHERE architect_id = ${architectId}` , (err, data) => {
             if (err) throw new Error(err);
 
             res.json(data.rows);
@@ -25,37 +25,37 @@ app.get("/getUserClients", (req, res) => {
 });
 
 app.get("/getConstructions", (req, res) => {
-    const clientId = req.body.clientId;
+    const customerId = req.body.customerId;
 
-    db.query(`SELECT * FROM tb_jobsite WHERE client_id = ${clientId}`, (err, data) => {
+    db.query(`SELECT * FROM tb_construction WHERE customer_id = ${customerId}`, (err, data) => {
         if (err) return res.json({"error": err});
 
-        return res.json(data.rows);
+         return res.json(data.rows);
     })
 })
 
 /* ==================== POST ROUTES ==================== */
 
-app.post("/createNewClient", (req, res) => {
+app.post("/createNewCustomer", (req, res) => {
     const architectId = req.body.architectId;
-    const clientName = req.body.clientName;
+    const customerName = req.body.customerName;
 
-    db.query("INSERT INTO tb_client (architect_id, client_name) VALUES ($1, $2)", [architectId, clientName], (err) => {
+    db.query("INSERT INTO tb_customer (architect_id, customer_name) VALUES ($1, $2)", [architectId, customerName], (err) => {
         if (err) return res.json({"error": err});
 
-        res.json({"message": "success"});
+        return res.json({"message": "success"});
     });
 });
 
 app.post("/createNewConstruction", (req, res) => {
-    const clientId = req.body.clientId;
+    const customerId = req.body.customerId;
     const constructionName = req.body.constructionName;
 
     try {
-        db.query("INSERT INTO tb_jobsite (client_id, jobsite_name) VALUES ($1, $2)", [clientId, constructionName], (err, data) => {
-            if (err) throw new Error(err);
+        db.query("INSERT INTO tb_construction (customer_id, construction_name) VALUES ($1, $2)", [customerId, constructionName], (err, data) => {
+            if (err) return res.json({"error": err});
 
-            res.json(data);
+            return res.json({"message": "success"});
         });
     } catch (error) {
         res.json({"error": error});
@@ -65,11 +65,11 @@ app.post("/createNewConstruction", (req, res) => {
 /* ==================== PATCH ROUTES ==================== */
 
 app.patch("/editCustomer", (req, res) => {
-    const clientId = req.body.clientId;
-    const clientName = req.body.clientName;
+    const customerId = req.body.customerId;
+    const customerName = req.body.customerName;
 
     try {
-        db.query(`UPDATE tb_client SET client_name = ($1) WHERE id = ${clientId}`, [clientName], (err) => {
+        db.query(`UPDATE tb_customer SET customer_name = ($1) WHERE id = ${customerId}`, [customerName], (err) => {
             if (err) throw new Error(err);
 
             res.json({"message": "success"});
@@ -85,8 +85,8 @@ app.patch("/editConstruction", (req, res) => {
     const constructionName = req.body.constructionName;
 
     try {
-        db.query(`UPDATE tb_jobsite SET jobsite_name = ($1) WHERE id = ${constructionId}`, [constructionName], (err) => {
-            if (err) throw new Error(err);
+        db.query(`UPDATE tb_construction SET construction_name = ($1) WHERE id = ${constructionId}`, [constructionName], (err) => {
+            if (err) return res.json({"error": err});
 
             res.json({"message": "success"});
         });
@@ -98,13 +98,17 @@ app.patch("/editConstruction", (req, res) => {
 /* ==================== DELETE ROUTES ==================== */
 
 app.delete("/deleteCustomer", (req, res) => {
-    const clientId = req.body.clientId;
+    const customerId = req.body.customerId;
 
     try {
-        db.query(`DELETE FROM tb_client WHERE id = ${clientId}`, (err) => {
-            if (err) throw new Error(err);
+        db.query(`DELETE FROM tb_customer WHERE id = ${customerId}`, (err) => {
+            if (err) return res.json({"error": err});
 
-            res.json({"message": "success"});
+            db.query(`DELETE FROM tb_construction WHERE customer_id = ${customerId}`, (err) => {
+                if (err) return res.json({"error": err});
+
+                res.json({"message": "success"});
+            })
         });
     } catch (error) {
         res.json({"error": error});
@@ -115,7 +119,7 @@ app.delete("/deleteConstruction", (req, res) => {
     const constructionId = req.body.constructionId;
 
     try {
-    db.query(`DELETE FROM tb_jobsite WHERE id = ${constructionId}`, (err) => {
+    db.query(`DELETE FROM tb_construction WHERE id = ${constructionId}`, (err) => {
         if (err) throw new Error(err);
 
         res.json({"message": "success"});
