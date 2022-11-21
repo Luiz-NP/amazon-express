@@ -11,18 +11,22 @@ require("./db/connect");
 
 app.get("/getUserCustomers/:architectId", (req, res) => {
     const architectId = req.params.architectId;
-    console.log(architectId);
 
-    try {
-        db.query("SELECT * FROM tb_customer WHERE architect_id = ($1)", [architectId] , (err, data) => {
-            if (err) return res.json({"error": err});
+    db.query("SELECT * FROM tb_customer WHERE architect_id = ($1)", [architectId] , (err, data) => {
+        if (err) return res.json({"error": err});
 
-            return res.json(data.rows);
-        });
-    } catch (error) {
-        res.json({"error": error});
-    }
+        return res.json(data.rows);
+    });
+});
 
+app.get("/getCustomers/:customerId", (req, res) => {
+    const customerId = req.params.customerId;
+
+    db.query("SELECT * FROM tb_customer WHERE id = ($1)", [customerId] , (err, data) => {
+        if (err) return res.json({"error": err});
+
+        return res.json(data.rows);
+    });
 });
 
 app.get("/getConstructions/:customerId", (req, res) => {
@@ -33,7 +37,7 @@ app.get("/getConstructions/:customerId", (req, res) => {
 
          return res.json(data.rows);
     })
-})
+});
 
 /* ==================== POST ROUTES ==================== */
 
@@ -98,8 +102,9 @@ app.patch("/editConstruction", (req, res) => {
 
 /* ==================== DELETE ROUTES ==================== */
 
-app.delete("/deleteCustomer", (req, res) => {
-    const customerId = req.body.customerId;
+app.delete("/deleteCustomer/:customerId", (req, res) => {
+    const customerId = req.params.customerId;
+    console.log(customerId)
 
     try {
         db.query(`DELETE FROM tb_customer WHERE id = ${customerId}`, (err) => {
